@@ -4,10 +4,16 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
+    <string name="action_logout">Cerrar sesión</string>
     <string name="title_activity_lista_productos">ListaProductos</string>
     <string name="title_activity_products_list">ProductsList</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="title_activity_login">Login</string>
+    <string name="title">iChopping</string>
+
+    <string name="facebook_app_id">849867805124535</string>
+
 </resources>

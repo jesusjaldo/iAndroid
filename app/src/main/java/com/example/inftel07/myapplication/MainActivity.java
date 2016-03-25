@@ -1,9 +1,6 @@
 package com.example.inftel07.myapplication;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -16,11 +13,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
+
+import model.User;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, HeadlinesFragment.OnHeadlineSelectedListener {
-    DrawerLayout drawer;
+
+    private DrawerLayout drawer;
+    private static User user;
+    private static String loginMode = "";
+    private final String FACEBOOK = "Facebook";
+    private final String GOOGLE = "Google";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +46,11 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        View header = navigationView.getHeaderView(0);
+        printUserInformation(header);
+
 
         if (findViewById(R.id.fragment_container) != null) {
-            System.out.println("Entra en lo de los fragmentos");
 
             // However, if we're being restored from a previous state,
             // then we don't need to do anything and should return or else
@@ -87,7 +97,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_logout) {
             return true;
         }
 
@@ -156,7 +166,7 @@ public class MainActivity extends AppCompatActivity
 
         // Capture the article fragment from the activity layout
         ArticleFragment articleFrag = (ArticleFragment)
-                getSupportFragmentManager().findFragmentById(R.id.article_fragment);
+                getSupportFragmentManager().findFragmentById(R.id.article);
 
         if (articleFrag != null) {
             // If article frag is available, we're in two-pane layout...
@@ -184,5 +194,32 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void printUserInformation (View header) {
+
+        String userGson = "";
+
+        if (getIntent().getStringExtra("facebookLogin")!=null) {
+            loginMode = FACEBOOK;
+            userGson = getIntent().getStringExtra("facebookLogin");
+
+        } else if (getIntent().getStringExtra("googleLogin")!=null) {
+            loginMode = GOOGLE;
+            userGson = getIntent().getStringExtra("googleLogin");
+        }
+
+        Gson gson = new Gson();
+        user =  gson.fromJson(userGson, User.class);
+
+        TextView textEmail = (TextView) header.findViewById(R.id.textViewEmail);
+        textEmail.setText(user.getEmail());
+
+        TextView textUserName = (TextView) header.findViewById(R.id.textViewUsername);
+        textUserName.setText(user.getUsername());
+
+        ImageView userImage = (ImageView) header.findViewById(R.id.imageViewUser);
+        Picasso.with(this).load(user.getPhoto()).into(userImage);
+
     }
+
+}
 
