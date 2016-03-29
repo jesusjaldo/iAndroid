@@ -11,10 +11,15 @@ public class User implements Serializable {
     String photo;
     String email;
 
-    public User(String email, String photo, String username) {
-        this.email = email;
-        this.photo = photo;
-        this.username = username;
+    private static User userInstance = null;
+
+    private User(){};
+
+    public static User getInstance() {
+        if(userInstance == null) {
+            userInstance = new User();
+        }
+        return userInstance;
     }
 
     public String getUsername() {

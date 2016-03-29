@@ -1,5 +1,28 @@
 <resources>
+
+    <!-- MENU -> activity_main_drawer-->
+    <string name="my_products">Mis productos</string>
+    <string name="products_area">Productos cercanos a ti</string>
+    <string name="logout">Salir</string>
+    <string name="options">Opciones</string>
+
+    <!--LAYOUT -> content_main-->
+    <string name="empty_list">¡No has publicado ningún producto! ¡Anímate!</string>
+
+
+
+
+
+
+
     <string name="app_name">iChopping</string>
+
+    <string name="new_product">Nuevo producto</string>
+
+    <string name="hint_nameProduct">Nombre del producto</string>
+    <string name="hint_descriptionProduct">Descripción del producto</string>
+    <string name="hint_price">Precio del producto</string>
+    <string name="btn_send">Publicar</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -15,5 +38,11 @@
     <string name="title">iChopping</string>
 
     <string name="facebook_app_id">849867805124535</string>
+    <string name="title_activity_add_new_product">Nuevo producto</string>
+    <string name="title_activity_new_product">Nuevo producto</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_view_product">ViewProduct</string>
+
+    <string name="preference_file_key">SharedPreferences</string>
 
 </resources>
