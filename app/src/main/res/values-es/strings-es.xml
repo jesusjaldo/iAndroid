@@ -14,7 +14,7 @@
     <string name="loading">Cargando</string>
     <string name="permissions">¡Habilita los permisos!</string>
 
-    <!-- com/example/inftel07/myapplication(JAVA) -> pruebagit -->
+    <!-- com/example/inftel07/myapplication(JAVA) -> NewProduct -->
     <string name="urlsaveProduct">http://192.168.183.43:8080/iChoppingWS/webresources/model.product/</string>
     <string name="fields">Debes rellenar todos los campos</string>
     <string name="share">He compartido este producto en iChopping: </string>

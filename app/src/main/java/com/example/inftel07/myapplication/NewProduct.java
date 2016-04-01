@@ -65,7 +65,7 @@ import model.Product;
 import model.User;
 import util.Util;
 
-public class pruebagit extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class NewProduct extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleMap mMap;
     private ImageButton photo;
@@ -107,11 +107,11 @@ public class pruebagit extends AppCompatActivity implements OnMapReadyCallback, 
         });
         imageProduct = (ImageView) findViewById(R.id.imageViewPhoto);
         if (savedInstanceState!=null){
-            Log.d("pruebagit","savedInstance != null");
+            Log.d("NewProduct","savedInstance != null");
             Bitmap imageBM = savedInstanceState.getParcelable("BitmapImage");
 
             if (imageBM!=null){
-                Log.d("pruebagit", "imaggeInstance != null");
+                Log.d("NewProduct", "imaggeInstance != null");
                 imageProduct.setImageBitmap(imageBM);
                 product.setImage(Util.bitmapToBase64(imageBM));
             }
@@ -130,7 +130,7 @@ public class pruebagit extends AppCompatActivity implements OnMapReadyCallback, 
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState){
-        Log.d("pruebagit", "OnSaveInstance");
+        Log.d("NewProduct", "OnSaveInstance");
 
         savedInstanceState.putParcelable("BitmapImage", imageBitmap);
         super.onSaveInstanceState(savedInstanceState);
@@ -194,7 +194,7 @@ public class pruebagit extends AppCompatActivity implements OnMapReadyCallback, 
                 if (networkInfo != null && networkInfo.isConnected()) {
                     new UploadProductClass().execute(urlsaveProduct);
                 } else {
-                    Log.d("pruebagit", "No network connection available.");
+                    Log.d("NewProduct", "No network connection available.");
                 }
             }
 
@@ -229,7 +229,7 @@ public class pruebagit extends AppCompatActivity implements OnMapReadyCallback, 
             try {
                 return uploadProduct(urls[0]);
             } catch (IOException e) {
-                Log.d("pruebagit", "Unable to retrieve web page. URL may be invalid.");
+                Log.d("NewProduct", "Unable to retrieve web page. URL may be invalid.");
                 return null;
             }
 
@@ -319,7 +319,7 @@ public class pruebagit extends AppCompatActivity implements OnMapReadyCallback, 
         // An unresolvable error has occurred and a connection to Google APIs
         // could not be established. Display an error message, or handle
         // the failure silently
-        Log.d("pruebagit", "onConnectionFailed");
+        Log.d("NewProduct", "onConnectionFailed");
     }
 
     public void onConnected(Bundle connectionHint) {
@@ -390,13 +390,13 @@ public class pruebagit extends AppCompatActivity implements OnMapReadyCallback, 
             @Override
             public void onCancel()
             {
-                Log.d("pruebagit", "onCancel");
+                Log.d("NewProduct", "onCancel");
             }
 
             @Override
             public void onError(FacebookException exception)
             {
-                Log.d("pruebagit", "onError");
+                Log.d("NewProduct", "onError");
             }
         });
 

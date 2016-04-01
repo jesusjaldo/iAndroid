@@ -287,7 +287,7 @@ public class MainActivity extends AppCompatActivity
 
 
     public void newProductPressed () {
-        Intent createProductIntent = new Intent(this, pruebagit.class);
+        Intent createProductIntent = new Intent(this, NewProduct.class);
         startActivity(createProductIntent);
     }
 

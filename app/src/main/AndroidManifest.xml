@@ -55,7 +55,7 @@
             android:value="@string/facebook_app_id"/>
 
         <activity
-            android:name=".pruebagit"
+            android:name=".NewProduct"
             android:label="@string/new_product"
             android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName="com.example.inftel07.myapplication.MainActivity"
