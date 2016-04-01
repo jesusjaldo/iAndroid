@@ -62,29 +62,31 @@ import model.User;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
+
     private DrawerLayout drawer;
     private User user;
-    public static String loginMode = "";
-    public static final String FACEBOOK = "Facebook";
-    public static final String GOOGLE = "Google";
+    private boolean search;
+    private List<Product> listProduct;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
+    private final int ACCESS_FINE_LOCATION = 0;
 
-    List<Product> listProduct;
-    ListViewAdapter adapter;
-
-    GoogleApiClient mGoogleApiClient;
-    Location mLastLocation;
-    final int ACCESS_FINE_LOCATION = 0;
-
-
-    private String urlProductCoordinate = "http://192.168.183.43:8080/iChoppingWS/webresources/model.product/getProductByCoordinate/";
-    private String urlProductUserName = "http://192.168.183.43:8080/iChoppingWS/webresources/model.product/getProductByUsername/";
+    private String urlProductCoordinate;
+    private String urlProductUserName;
+    private String urlProductQuery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //initialize variables
+        urlProductCoordinate = getString(R.string.urlProductCoordinate);
+        urlProductUserName = getString(R.string.urlProductUserName);
+        urlProductQuery = getString(R.string.urlProductQuery);
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -116,33 +118,13 @@ public class MainActivity extends AppCompatActivity
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
+                    .addApi(Auth.GOOGLE_SIGN_IN_API)
                     .build();
         }
 
+        search = false;
         handleIntent(getIntent());
 
-        /*
-        if (findViewById(R.id.fragment_container) != null) {
-
-            // However, if we're being restored from a previous state,
-            // then we don't need to do anything and should return or else
-            // we could end up with overlapping fragments.
-            if (savedInstanceState != null) {
-                return;
-            }
-
-            // Create an instance of ExampleFragment
-            HeadlinesFragment firstFragment = new HeadlinesFragment();
-
-            // In case this activity was started with special instructions from an Intent,
-            // pass the Intent's extras to the fragment as arguments
-            firstFragment.setArguments(getIntent().getExtras());
-
-            // Add the fragment to the 'fragment_container' FrameLayout
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, firstFragment).commit();
-            System.out.println("1111111111111111");
-        }*/
     }
 
        @Override
@@ -155,11 +137,11 @@ public class MainActivity extends AppCompatActivity
 
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            //use the query to search your data somehow
-            Log.d("Mi Busqueda", query);
+            Log.d("MainActivity", query);
+            search = true;
+            getProducts(urlProductQuery + query);
         }
     }
-
 
     public void onStart() {
         mGoogleApiClient.connect();
@@ -194,8 +176,7 @@ public class MainActivity extends AppCompatActivity
         // An unresolvable error has occurred and a connection to Google APIs
         // could not be established. Display an error message, or handle
         // the failure silently
-
-        // ...
+        Log.d("MainActivity", "onConnectionFailed");
     }
 
 
@@ -203,20 +184,19 @@ public class MainActivity extends AppCompatActivity
 
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Check Permissions Now
-            final int REQUEST_LOCATION = 2;
+                != PackageManager.PERMISSION_GRANTED) { // Check Permissions Now
 
             ActivityCompat.requestPermissions(
                     this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     ACCESS_FINE_LOCATION);
-            System.out.println("espro?");
 
         } else {
             // permission has been granted, continue as usual
             mLastLocation =
                     LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            getProducts(urlProductCoordinate + mLastLocation.getLongitude() + "/" + mLastLocation.getLatitude());
+            if (!search){
+                getProducts(urlProductCoordinate + mLastLocation.getLongitude() + "/" + mLastLocation.getLatitude());
+            }
 
         }
 
@@ -224,23 +204,20 @@ public class MainActivity extends AppCompatActivity
 
     public void getProducts (String url) {
 
-        System.out.println("LLEGA a getProducts");
-
         ConnectivityManager connMgr = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
         if (networkInfo != null && networkInfo.isConnected()) {
-            System.out.println("yuju " + mLastLocation.getLatitude() + " " + mLastLocation.getLongitude());
-            //Añadir longitud latitud
             new DownloadProductClass().execute(url);
-            System.out.println("onCreate tras execute");
         } else {
-            System.out.println("No network connection available.");
+            Log.d("MainActivity","No network connection available.");
         }
 
     }
 
     @Override
     public void onConnectionSuspended(int i) {
+        Log.d("MainActivity","onConnectionSuspended");
 
     }
 
@@ -253,13 +230,10 @@ public class MainActivity extends AppCompatActivity
 
             // params comes from the execute() call: params[0] is the url.
             try {
-
-                System.out.println("downloadProducts " + urls[0]);
                 return downloadProducts(urls[0]);
 
-
             } catch (IOException e) {
-                System.out.println("Unable to retrieve web page. URL may be invalid.");
+                Log.d("MainActivity","doInBackground exception");
                 return null;
             }
 
@@ -275,7 +249,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPreExecute()
         {
-            Dialog.setMessage("Cargando");
+            Dialog.setMessage(getString(R.string.loading));
             Dialog.show();
         }
     }
@@ -290,7 +264,6 @@ public class MainActivity extends AppCompatActivity
         con.setRequestMethod("GET");
 
         int responseCode = con.getResponseCode();
-        System.out.println("Response Code : " + responseCode);
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
@@ -304,20 +277,15 @@ public class MainActivity extends AppCompatActivity
         in.close();
         con.disconnect();
 
-        System.out.println("RESPUESTAAA: " + myurl + " \n" + response.toString());
-
         JSONArray json = null;
         try {
             json = new JSONArray(response.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        //System.out.println("aleho: " + json);
 
         Gson gson = new Gson();
         listProduct = gson.fromJson(String.valueOf(json), new TypeToken<List<Product>>(){}.getType());
-
-        //System.out.println("erprimero: " + listProduct.get(0).toString());
 
         return listProduct;
     }
@@ -342,12 +310,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         MenuItem searchItem = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
 
-        Log.d("buscar", searchView.toString());
         // Configure the search info and add any event listeners
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -355,18 +323,7 @@ public class MainActivity extends AppCompatActivity
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
 
-
         return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -377,14 +334,16 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.my_products) {
             getProducts(urlProductUserName+user.getEmail());
-            System.out.println("LLEGA onNavigationItemSelected");
 
         } else if (id == R.id.products_area) {
             getProducts(urlProductCoordinate + mLastLocation.getLongitude() + "/" + mLastLocation.getLatitude());
 
         } else if (id == R.id.logout) {
 
+            Auth.GoogleSignInApi.signOut(mGoogleApiClient);
+
             user = null;
+
             SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPref.edit();
 
@@ -394,35 +353,13 @@ public class MainActivity extends AppCompatActivity
             editor.commit();
 
             Intent logoutIntent = new Intent(this, Login.class);
-            LoginManager.getInstance().logOut();
-
-
             startActivity(logoutIntent);
             finish();
 
+        } else if (id == R.id.new_product) {
+            newProductPressed();
         }
 
-        // In case this activity was started with special instructions from an Intent,
-        // pass the Intent's extras to the fragment as arguments
-
-
-        /*DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);*/
-        /*try {
-            fragment = (Fragment) fragmentClass.newInstance();
-            fragment.setArguments(getIntent().getExtras());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit();
-
-        // Highlight the selected item, update the title, and close the drawer
-        // Highlight the selected item has been done by NavigationView
-        // menuItem.setChecked(true);*/
         setTitle(item.getTitle());
         drawer.closeDrawers();
         return true;
@@ -444,17 +381,13 @@ public class MainActivity extends AppCompatActivity
                     ConnectivityManager connMgr = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
                     NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
                     if (networkInfo != null && networkInfo.isConnected()) {
-                        System.out.println("yuju " + mLastLocation.getLatitude() + " " + mLastLocation.getLongitude());
-                        //Añadir longitud latitud
                         new DownloadProductClass().execute(urlProductCoordinate + mLastLocation.getLongitude() + "/" + mLastLocation.getLatitude());
-                        System.out.println("onCreate tras execute");
                     } else {
-                        System.out.println("No network connection available.");
+                        Log.d("MainActivity", "No network connection available.");
                     }
 
-
                 } else {
-                    Toast.makeText(this, "¡Habilita los permisos!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.permissions), Toast.LENGTH_LONG).show();
                 }
                 return;
             }
@@ -472,7 +405,9 @@ public class MainActivity extends AppCompatActivity
         textUserName.setText(user.getUsername());
 
         ImageView userImage = (ImageView) header.findViewById(R.id.imageViewUser);
-        Picasso.with(this).load(user.getPhoto()).into(userImage);
+        if(!user.getPhoto().equals("")){
+            Picasso.with(this).load(user.getPhoto()).into(userImage);
+        }
 
     }
 

@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/action_delete"
-        android:title="prueba"
+        android:title="item"
         android:icon="@drawable/ic_delete_24dp"
         app:showAsAction="ifRoom"/>
 

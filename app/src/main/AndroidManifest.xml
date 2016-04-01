@@ -52,11 +52,11 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id" />
+            android:value="@string/facebook_app_id"/>
 
         <activity
             android:name=".NewProduct"
-            android:label="@string/title_activity_new_product"
+            android:label="@string/new_product"
             android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName="com.example.inftel07.myapplication.MainActivity"
             android:screenOrientation="portrait">
@@ -79,7 +79,6 @@
 
         <activity
             android:name=".ViewProduct"
-            android:label="@string/title_activity_view_product"
             android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName="com.example.inftel07.myapplication.MainActivity">
             <meta-data
@@ -87,6 +86,11 @@
                 android:value="com.example.inftel07.myapplication.MainActivity" />
 
         </activity>
+
+        <provider android:authorities="com.facebook.app.FacebookContentProvider849867805124535"
+            android:name="com.facebook.FacebookContentProvider"
+            android:exported="true"/>
+
     </application>
 
 </manifest>

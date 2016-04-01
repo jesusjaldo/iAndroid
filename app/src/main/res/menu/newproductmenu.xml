@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/action_save"
-        android:title="prueba"
+        android:title="item"
         android:icon="@drawable/com_facebook_button_like_icon_selected"
         app:showAsAction="ifRoom"/>
 </menu>

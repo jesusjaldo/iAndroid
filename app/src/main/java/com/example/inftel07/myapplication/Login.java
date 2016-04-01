@@ -20,6 +20,7 @@ import com.facebook.FacebookSdk;
 
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
@@ -44,6 +45,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 import model.Product;
@@ -51,24 +53,23 @@ import model.User;
 
 public class Login extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
-    private static final long SPLASH_TIME_OUT = 2;
+    //Login Google
     private GoogleApiClient mGoogleApiClient;
+    private GoogleSignInOptions gso;
     private int RC_SIGN_IN = 1;
-    private LoginButton loginButton;
-    private CallbackManager callbackManager;
-    private AccessTokenTracker accessTokenTracker;
+    //SharedPreference for login
     private SharedPreferences sharedPref;
-
-    private String urlLogin = "http://192.168.183.43:8080/iChoppingWS/webresources/model.membership/";
+    //URL restful Login
+    private String urlLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Initialize sdk Facebook
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        callbackManager = CallbackManager.Factory.create();
+        //Initialize variables
+        urlLogin = getString(R.string.urlLogin);
 
+        //Load content sharedPreference
         sharedPref =  getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         String email = sharedPref.getString("email", "");
         String username = sharedPref.getString("username", "");
@@ -80,15 +81,14 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
             user.setUsername(username);
             goMainActivity(user, false);
 
-        } else {
+        } else { //Login
 
             setContentView(R.layout.activity_login);
 
             // Configure sign-in to request the user's ID, email address, and basic
             // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestEmail()
-                            //.requestProfile()
                     .build();
 
             // Build a GoogleApiClient with access to the Google Sign-In API and the
@@ -98,74 +98,16 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
                     .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                     .build();
 
-
-
             //Set the listener button signIn
             findViewById(R.id.sign_in_button).setOnClickListener(this);
 
-            //Facebook button
-            loginButton = (LoginButton) findViewById(R.id.login_button);
-            loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-
-                @Override
-                public void onSuccess(LoginResult loginResult) {
-
-
-                    GraphRequest data_request = GraphRequest.newMeRequest(
-                            loginResult.getAccessToken(),
-                            new GraphRequest.GraphJSONObjectCallback() {
-                                @Override
-                                public void onCompleted(
-                                        JSONObject json_object,
-                                        GraphResponse response) {
-
-                                    try {
-                                        JSONObject jsonPicture = ((JSONObject) json_object.get("picture")).getJSONObject("data");
-                                        User user = User.getInstance();
-                                        user.setEmail(json_object.getString("id"));
-                                        user.setPhoto(jsonPicture.getString("url"));
-                                        user.setUsername(json_object.getString("name"));
-                                        MainActivity.loginMode = MainActivity.FACEBOOK;
-                                        new LoginUserClass().execute(urlLogin);
-                                        goMainActivity(user, true);
-
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-
-
-                                }
-                            });
-                    Bundle permission_param = new Bundle();
-                    permission_param.putString("fields", "id,name,email,picture");
-                    data_request.setParameters(permission_param);
-                    data_request.executeAsync();
-
-                }
-
-                @Override
-                public void onCancel() {
-                    System.out.println("Login attempt canceled.");
-
-                }
-
-                @Override
-                public void onError(FacebookException e) {
-                    System.out.println("Login attempt failed.");
-
-                }
-            });
         }
 
     }
 
-
-
-
     @Override
     public void onConnectionFailed(ConnectionResult result){
-        Log.i("MainActivity", "Conection Failed");
+        Log.d("Login", "Conection Failed");
 
     }
 
@@ -175,7 +117,6 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
             case R.id.sign_in_button:
                 signIn();
                 break;
-            // ...
         }
     }
 
@@ -192,16 +133,13 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
-        } else {
-            callbackManager.onActivityResult(requestCode, resultCode, data);
         }
     }
 
 
     private void handleSignInResult(GoogleSignInResult result) {
-        Log.d("MainAct", "handleSignInResult:" + result.isSuccess());
 
-        MainActivity.loginMode = MainActivity.GOOGLE;
+        Log.d("Login", "handleSignInResult:" + result.isSuccess());
 
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
@@ -210,37 +148,22 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
             User user = User.getInstance();
             user.setEmail(acct.getEmail());
             if (acct.getPhotoUrl() == null) {
-                user.setPhoto("https://cdn3.iconfinder.com/data/icons/ballicons-free/128/wooman.png");
+                user.setPhoto("");
             } else {
                 user.setPhoto("http://" + acct.getPhotoUrl().getHost() + acct.getPhotoUrl().getPath());
             }
 
             user.setUsername(acct.getDisplayName());
-
-            System.out.println("USER: " + user.getEmail());
-            MainActivity.loginMode = MainActivity.GOOGLE;
             new LoginUserClass().execute(urlLogin);
             goMainActivity(user, true);
 
         } else {
-            Log.d("MainAct", "NameSignInResult Error");
+            Log.d("Login", "NameSignInResult Error");
         }
     }
 
 
-    public void signOut() {
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(Status status) {
-                        // ...
-                        Log.d("MainAct", "Sign OUT");
-                    }
-                });
-    }
-
     private void goMainActivity(User user, boolean newSession){
-
 
         if (newSession) {
             sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
@@ -266,16 +189,12 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
 
             // params comes from the execute() call: params[0] is the url.
             try {
-                System.out.println("LoginUser " + urls[0]);
                 return loginUser(urls[0]);
 
-
             } catch (IOException e) {
-                System.out.println("Unable to retrieve web page. URL may be invalid.");
+                Log.d("Login", "Unable to retrieve web page. URL may be invalid.");
                 return null;
             }
-
-
         }
 
         @Override
@@ -292,14 +211,11 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
         URL obj = new URL(getURL);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
-        // optional default is GET
         con.setRequestMethod("GET");
 
         int responseCode = con.getResponseCode();
-        System.out.println("URLGET: " + getURL);
-        System.out.println("Response Code : " + responseCode);
 
-        if (responseCode != 200) {
+        if (responseCode == 204) {
 
             URL url = new URL(myurl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -318,8 +234,6 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
                 e.printStackTrace();
             }
 
-            System.out.println("JSONREQ-2: " + jsonObject);
-
             OutputStreamWriter wr= new OutputStreamWriter(conn.getOutputStream());
             wr.write(jsonObject.toString());
             wr.flush();
@@ -328,11 +242,8 @@ public class Login extends AppCompatActivity implements GoogleApiClient.OnConnec
             // Starts the query
             conn.connect();
 
-            System.out.println("RESPONSE: " + conn.getResponseMessage());
             int response2 = conn.getResponseCode();
-            Log.d("DEBUGTAG", "The response is: " + response2);
-
-
+            Log.d("Login", "The response is: " + response2);
         }
 
         con.disconnect();

@@ -15,7 +15,6 @@ public class Product {
     String latitude;
     User username;
     int idproduct;
-    Bitmap imageBitMap;
 
     public Product() {
     }
@@ -93,14 +92,6 @@ public class Product {
 
     public void setIdproduct(int idproduct) {
         this.idproduct = idproduct;
-    }
-
-    public Bitmap getImageBitMap() {
-        return imageBitMap;
-    }
-
-    public void setImageBitMap(Bitmap imageBitMap) {
-        this.imageBitMap = imageBitMap;
     }
 
     @Override

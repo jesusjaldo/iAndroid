@@ -29,8 +29,8 @@ public class ListViewAdapter extends BaseAdapter {
 
 
     // Declare Variables
-    Context mContext;
-    LayoutInflater inflater;
+    private Context mContext;
+    private LayoutInflater inflater;
     private List<Product> productModelList = null;
     private ArrayList<Product> arraylist;
 
@@ -43,7 +43,6 @@ public class ListViewAdapter extends BaseAdapter {
     }
 
     public class ViewHolder {
-        TextView userName;
         TextView price;
         TextView nameProduct;
         de.hdodenhof.circleimageview.CircleImageView imageProduct;
@@ -67,18 +66,21 @@ public class ListViewAdapter extends BaseAdapter {
     public View getView(final int position, View view, ViewGroup parent) {
         final ViewHolder holder;
         if (view == null) {
-            //System.out.println("Prifdsaemro"+productModelList.get(0).getNameproduct());
+
             holder = new ViewHolder();
             view = inflater.inflate(R.layout.listfragment, null);
-            // Locate the TextViews in listview_item.xml
+
+            // Locate the TextViews in listfragment.xml
             holder.nameProduct = (TextView) view.findViewById(R.id.nameProductList);
             holder.price = (TextView) view.findViewById(R.id.priceProductList);
             holder.imageProduct = (de.hdodenhof.circleimageview.CircleImageView) view.findViewById(R.id.icon);
-            //holder.userName = (TextView) view.findViewById(R.id.);
+
             view.setTag(holder);
+
         } else {
             holder = (ViewHolder) view.getTag();
         }
+
         // Set the results into TextViews
         holder.nameProduct.setText(productModelList.get(position).getNameproduct());
         holder.price.setText(productModelList.get(position).getPrice());
@@ -86,16 +88,11 @@ public class ListViewAdapter extends BaseAdapter {
         holder.imageProduct.setImageBitmap(bitmap);
 
 
-
-        //holder.userName.setText(productModelList.get(position).getUserName());
-
         // Listen for ListView Item Click
-
         view.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-                // Send single item click data to SingleItemView Class
                 Intent intent = new Intent(mContext, ViewProduct.class);
                 Gson productGson = new Gson();
                 String productString = productGson.toJson(productModelList.get(position));
@@ -107,24 +104,5 @@ public class ListViewAdapter extends BaseAdapter {
         return view;
     }
 
-    // Filter Class
-    /*public void filter(String charText) {
-        charText = charText.toLowerCase(Locale.getDefault());
-        productModelList.clear();
-        if (charText.length() == 0) {
-            productModelList.addAll(arraylist);
-        }
-        else
-        {
-            for (Product pm : arraylist)
-            {
-                if (pm.getNameproduct().toLowerCase(Locale.getDefault()).contains(charText))
-                {
-                    productModelList.add(pm);
-                }
-            }
-        }
-        notifyDataSetChanged();
-    }*/
 
 }
