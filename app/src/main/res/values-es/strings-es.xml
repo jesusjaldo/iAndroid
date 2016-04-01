@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Adapter(JAVA) -> ListViewAdapter-->
+
+    <!-- com/example/inftel07/myapplication(JAVA) -> Login -->
+    <string name="urlLogin">http://192.168.183.43:8080/iChoppingWS/webresources/model.membership/</string>
+    <string name="preference_file_key">SharedPreferences</string>
+
+    <!-- com/example/inftel07/myapplication(JAVA) -> MainActivity -->
+    <string name="urlProductCoordinate">http://192.168.183.43:8080/iChoppingWS/webresources/model.product/getProductByCoordinate/</string>
+    <string name="urlProductUserName">http://192.168.183.43:8080/iChoppingWS/webresources/model.product/getProductByUsername/</string>
+    <string name="urlProductQuery">http://192.168.183.43:8080/iChoppingWS/webresources/model.product/getProductByQuery/</string>
+    <string name="loading">Cargando</string>
+    <string name="permissions">¡Habilita los permisos!</string>
+
+    <!-- com/example/inftel07/myapplication(JAVA) -> NewProduct -->
+    <string name="urlsaveProduct">http://192.168.183.43:8080/iChoppingWS/webresources/model.product/</string>
+    <string name="fields">Debes rellenar todos los campos</string>
+    <string name="share">He compartido este producto en iChopping: </string>
+    <string name="newProductSave">Nuevo producto guardado</string>
+    <string name="questionFacebook">¿Desea publicar este contenido en Facebook?</string>
+    <string name="confirmation">Confirmacion</string>
+    <string name="accept">Aceptar</string>
+    <string name="cancel">Cancelar</string>
+
+    <!-- com/example/inftel07/myapplication(JAVA) -> ViewProduct -->
+    <string name="emailClient">Elija una aplicación para enviar el e-mail</string>
+    <string name="questionDelete">¿Realmente desea borrar este producto?</string>
+
+    <!-- util(JAVA) -> Util -->
+    <string name="interested">Estoy interesado en: </string>
+
+    <!--LAYOUT -> content_main-->
+    <string name="empty_list">¡No hay ningún producto que mostrar! ¡Anímate!</string>
+
+    <!--LAYOUT -> content_new_product-->
+    <string name="hint_nameProduct">Nombre del producto</string>
+    <string name="hint_descriptionProduct">Descripción del producto</string>
+    <string name="hint_price">Precio del producto</string>
+    <string name="btn_send">Publicar</string>
+    <string name="take_photo">Realizar fotografía</string>
+
+
+    <!-- MENU -> activity_main_drawer-->
+    <string name="my_products">Mis productos</string>
+    <string name="products_area">Productos cercanos a ti</string>
+    <string name="logout">Salir</string>
+    <string name="options">Opciones</string>
+    <string name="new_product">Nuevo producto</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- MENU -> main-->
+    <string name="search">Buscar</string>
+
+
+    <!--Manifest-->
+    <string name="app_name">iChopping</string>
+    <string name="facebook_app_id">849867805124535</string>
+
+
+</resources>
